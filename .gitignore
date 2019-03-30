@@ -1,5 +1,5 @@
 *.pdf
 *.csv
-*.keras
+
 *.pyc
 23_logs/
