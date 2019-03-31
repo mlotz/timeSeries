@@ -317,6 +317,16 @@ df_agregat_train = df_y_train.rolling(min_periods=24, window=24).sum()
 df_agregat_test_true = df_y_test_true.rolling(min_periods=24, window=24).sum()
 df_agregat_test = df_y_test.rolling(min_periods=24, window=24).sum()
 
+
+
+#shift o 24 do tylu, bo rolling oblicza ostatnie 24, a ja chce nastepne 24.
+df_agregat_train_true[0] = df_agregat_train_true[0].shift(-24)
+df_agregat_train[0] = df_agregat_train[0].shift(-24)
+df_agregat_test_true[0] = df_agregat_test_true[0].shift(-24)
+df_agregat_test[0] = df_agregat_test[0].shift(-24)
+
+#rysowanie
+
 plt.figure()
 plt.plot(df_agregat_train_true, label='true')
 plt.plot(df_agregat_train, label='pred')
