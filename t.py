@@ -17,33 +17,6 @@ from tensorflow.python.keras.optimizers import RMSprop
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
 
 
-#funkcja do rysowania
-def plot_comparison(start_idx, length=100, train=True, warmup_steps= 50):
-	if train:
-		x = x_train_scaled
-		y_true = y_train
-	else:
-		x = x_test_scaled
-		y_true = y_test
-    
-	end_idx = start_idx + length
-	x = x[start_idx:end_idx]
-	y_true = y_true[start_idx:end_idx]
-	x = np.expand_dims(x, axis=0)
-	y_pred = model.predict(x)
-	y_pred_rescaled = y_scaler.inverse_transform(y_pred[0])
-	signal = 0
-	signal_pred = y_pred_rescaled[:, signal]
-	signal_true = y_true[:, signal]
-	plt.figure(figsize=(15,5))
-        plt.plot(signal_true, label='true')
-	plt.plot(signal_pred, label='pred')
-	p = plt.axvspan(0, warmup_steps, facecolor='black', alpha=0.15)
-	plt.ylabel('ZAP')
-	plt.legend()
-	plt.savefig('24h_pred_test.pdf')
-	#plt.show()
-
 
 
 
@@ -289,13 +262,72 @@ print("loss (test-set):", result)
 
 
 ##rysownie
-print(len(x_train_scaled))
-plot_comparison(start_idx=0, length=17000, train=False)
+#print(len(x_train_scaled))
+#plot_comparison(start_idx=0, length=17000, train=False)
+
+x = np.expand_dims(x_train_scaled, axis=0)
+y_pred = model.predict(x)
+y_train_pred_rescaled = y_scaler.inverse_transform(y_pred[0])
+
+x = np.expand_dims(x_test_scaled, axis=0)
+y_pred = model.predict(x)
+y_test_pred_rescaled = y_scaler.inverse_transform(y_pred[0])
+
+
+
+df_y_train = pd.DataFrame(data=y_train_pred_rescaled[1:,0])
+TIR = pd.date_range('2016-01-01 3:00', periods = len(df_y_train), freq='H')
+df_y_train.index = TIR
+df_y_train_true = pd.DataFrame(data=y_train[1:,0])
+df_y_train_true.index = TIR
+#print(df_y_train)
+
+
+plt.figure()
+plt.plot(df_y_train_true, label='true')
+plt.plot(df_y_train, label='pred')
+plt.ylabel('ZAP')
+plt.legend()
+plt.savefig('24h_pred_learn.pdf')
+
+
+df_y_test = pd.DataFrame(data=y_test_pred_rescaled[1:,0])
+TIR = pd.date_range('2018-01-07 23:00:00', periods = len(df_y_test), freq='H')
+df_y_test.index = TIR
+df_y_test_true = pd.DataFrame(data=y_test[1:,0])
+df_y_test_true.index = TIR
+#print(df_y_test)
+
+
+plt.figure()
+plt.plot(df_y_test_true, label='true')
+plt.plot(df_y_test, label='pred')
+plt.ylabel('ZAP')
+plt.legend()
+plt.savefig('24h_pred_test.pdf')
 
 
 
 
+####Agregat###
 
 
+df_agregat_train_true = df_y_train_true.rolling(min_periods=24, window=24).sum()
+df_agregat_train = df_y_train.rolling(min_periods=24, window=24).sum()
+df_agregat_test_true = df_y_test_true.rolling(min_periods=24, window=24).sum()
+df_agregat_test = df_y_test.rolling(min_periods=24, window=24).sum()
 
+plt.figure()
+plt.plot(df_agregat_train_true, label='true')
+plt.plot(df_agregat_train, label='pred')
+plt.ylabel('ZAP')
+plt.legend()
+plt.savefig('24h_agregat_learn.pdf')
+
+plt.figure()
+plt.plot(df_agregat_test_true, label='true')
+plt.plot(df_agregat_test, label='pred')
+plt.ylabel('ZAP')
+plt.legend()
+plt.savefig('24h_agregat_test.pdf')
 ##EOF##
