@@ -210,28 +210,28 @@ model.compile(loss=loss_mse_warmup, optimizer=optimizer)
 model.summary()
 
 
-
+##Checkpoints
 path_checkpoint = '23_checkpoint.keras'
 callback_checkpoint = ModelCheckpoint(filepath=path_checkpoint,
                                       monitor='val_loss',
                                       verbose=1,
                                       save_weights_only=True,
                                       save_best_only=True)
-
+##EarlyStop
 callback_early_stopping = EarlyStopping(monitor='val_loss',
                                         patience=5, verbose=1)
-
+##logi
 callback_tensorboard = TensorBoard(log_dir='./23_logs/',
                                    histogram_freq=0,
                                    write_graph=False)
-
+##learning rate
 callback_reduce_lr = ReduceLROnPlateau(monitor='val_loss',
                                        factor=0.1,
                                        min_lr=1e-4,
                                        patience=0,
                                        verbose=1)
 
-
+#callback vector
 callbacks = [callback_early_stopping,
              callback_checkpoint,
              callback_tensorboard,
@@ -252,7 +252,7 @@ try:
 except Exception as error:
     print("Error trying to load checkpoint.")
     print(error)
-
+##//Train
 
 ##test set
 result = model.evaluate(x=np.expand_dims(x_test_scaled, axis=0),y=np.expand_dims(y_test_scaled, axis=0))
@@ -311,7 +311,7 @@ plt.savefig('24h_pred_test.pdf')
 
 ####Agregat###
 
-
+##Suma na 24h oknie czasowym
 df_agregat_train_true = df_y_train_true.rolling(min_periods=24, window=24).sum()
 df_agregat_train = df_y_train.rolling(min_periods=24, window=24).sum()
 df_agregat_test_true = df_y_test_true.rolling(min_periods=24, window=24).sum()
