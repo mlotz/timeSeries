@@ -340,4 +340,6 @@ plt.plot(df_agregat_test, label='pred')
 plt.ylabel('ZAP')
 plt.legend()
 plt.savefig('24h_agregat_test.pdf')
+
+print(keras.__version__)
 ##EOF##
